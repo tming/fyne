@@ -20,15 +20,15 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var topWindow fyne.Window
+// var topWindow fyne.Window
 
 func main() {
 	a := app.NewWithID("fyne.deepseek.tm")
 	a.SetIcon(data.FyneLogo)
 	makeTray(a)
-	// logLifecycle(a)
+
 	w := a.NewWindow("fyne.deepseek Demo")
-	topWindow = w
+	// topWindow = w
 
 	w.SetMainMenu(makeMenu(a, w))
 	w.SetMaster()
@@ -37,7 +37,8 @@ func main() {
 	promptText := makeText("input your prompt here...")
 
 	tokenLabel := widget.NewLabel("token")
-	tokenText := makeText("input your deepseek-token here...")
+	tokenText := widget.NewPasswordEntry()
+	tokenText.SetPlaceHolder("input your deepseek-token here...")
 
 	contentText := makeText("here is the response")
 
@@ -46,13 +47,8 @@ func main() {
 		if !ok {
 			log.Panicln("failed to convert fyne.CanvasObject to *widget.Entry")
 		}
-		entryToken, ok := tokenText.(*widget.Entry)
-		if !ok {
-			log.Panicln("failed to convert fyne.CanvasObject to *widget.Entry")
-		}
-		log.Printf("ready query deepseek with prompt(%s) token(%s) now...\n", entryPrompt.Text, entryToken.Text)
 
-		response := queryDeepSeek(entryPrompt.Text, entryToken.Text)
+		response := queryDeepSeek(entryPrompt.Text, tokenText.Text)
 
 		entryContent, ok := contentText.(*widget.Entry)
 		if !ok {
@@ -60,9 +56,6 @@ func main() {
 		}
 		entryContent.SetText(response)
 	})
-
-	// content := container.NewStack()
-	// content.Objects = []fyne.CanvasObject{makeText("")}
 
 	win := container.NewBorder(
 		container.NewVBox(promptLabel, promptText, widget.NewSeparator(), tokenLabel, tokenText, button),
@@ -72,21 +65,6 @@ func main() {
 	w.Resize(fyne.NewSize(640, 460))
 	w.ShowAndRun()
 }
-
-// func logLifecycle(a fyne.App) {
-// 	a.Lifecycle().SetOnStarted(func() {
-// 		log.Println("Lifecycle: Started")
-// 	})
-// 	a.Lifecycle().SetOnStopped(func() {
-// 		log.Println("Lifecycle: Stopped")
-// 	})
-// 	a.Lifecycle().SetOnEnteredForeground(func() {
-// 		log.Println("Lifecycle: Entered Foreground")
-// 	})
-// 	a.Lifecycle().SetOnExitedForeground(func() {
-// 		log.Println("Lifecycle: Exited Foreground")
-// 	})
-// }
 
 func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 	newItem := fyne.NewMenuItem("New", nil)
